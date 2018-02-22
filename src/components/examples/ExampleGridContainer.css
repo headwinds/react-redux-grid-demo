@@ -8,10 +8,22 @@
 }
 
 /* override React-Redux-Grid library */
+
+.react-grid-table-container {
+  height: auto !important;
+  max-height: 500px !important;
+}
 .react-grid-pager-toolbar {
   height: 40px !important;
   padding: 5px !important;
+}
 
+.react-grid-container {
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.react-grid-checkbox-container {
+  width: 30px !important;
 }
 
 .react-grid-header-fixed-container th {
@@ -40,11 +52,11 @@
   margin-right: 10px;
 }
 
-.table-responsive thead  {
+.table-responsive thead {
   display: none !important;
 }
 
-input[type="text"] {
+input[type='text'] {
   color: #000;
   height: 20px;
   border-radius: 5px;
@@ -89,6 +101,7 @@ th {
   font-family: 'Open Sans', sans-serif;
 }
 
-button.react-redux-grid-active, button.react-redux-grid-inactive {
+button.react-redux-grid-active,
+button.react-redux-grid-inactive {
   border: none !important;
 }

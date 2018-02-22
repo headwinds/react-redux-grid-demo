@@ -6,20 +6,18 @@ import Footer from './components/footer/Footer';
 import './App.css';
 
 class App extends Component {
-
   render() {
     return (
       <div className="app">
-        <Header />        
+        <Header />
         <div className="split">
-          <div className="sidebarsContainer">
-            <FeaturesSidebar store={this.props.store} />
+          <div className="sidebarContainer">
             <ExamplesSidebar store={this.props.store} />
           </div>
-          <div className="tableContainer">
-            {this.props.children}
+          <div className="tableContainer">{this.props.children}</div>
+          <div className="featureContainer">
+            <FeaturesSidebar store={this.props.store} />
           </div>
-          
         </div>
         <Footer />
       </div>

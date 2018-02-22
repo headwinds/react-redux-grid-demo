@@ -1,48 +1,38 @@
 /* eslint-disable */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Grid } from 'react-redux-grid';
-
+import store from '../../../redux/configureStore';
 import Pager from './Pager';
-import Api from './..//data/Api';
+import Api from './../data/Api';
 
-import {
+import { columns, data, events, dataSource } from './../data/demodata';
+
+export const CustomPager = () => {
+  const props = {
     columns,
-    data,
+    dataSource: Api,
+    plugins: {
+      PAGER: {
+        enabled: true,
+        pagingType: 'remote',
+        pagerComponent: <Pager api={Api} store={store} />
+      }
+    },
     events,
-    dataSource
-} from './..//data/demodata';
+    store,
+    stateKey: 'custom-pager'
+  };
 
-export const CustomFooter = ({ store }) => {
-
-    const customFooter = {
-        columns,
-        dataSource: Api,
-        plugins: {
-            PAGER: {
-                enabled: true,
-                pagingType: 'remote',
-                pagerComponent: (
-                    <Pager
-                        api={Api}
-                        store={store}
-                    />
-                )
-            }
-        },
-        events,
-        store,
-        stateKey: 'custom-pager'
-    };
-
-    return <Grid { ...customFooter } />;
+  return <Grid {...props} />;
 };
 
 const { object } = PropTypes;
 
-CustomFooter.propTypes = {
-    store: object.isRequired
+CustomPager.propTypes = {
+  store: object.isRequired
 };
 
-CustomFooter.defaultProps = {};
+CustomPager.defaultProps = {};
 
-export default CustomFooter;
+export default CustomPager;

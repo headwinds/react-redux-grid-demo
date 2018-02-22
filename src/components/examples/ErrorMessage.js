@@ -1,53 +1,46 @@
 /* eslint-disable */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Grid, Actions } from 'react-redux-grid';
 
-import {
-    columns,
-    data,
-    pageSize,
-    events,
-    dataSource
-} from './data/demodata';
+import { columns, data, pageSize, events, dataSource } from './data/demodata';
 
 export class ErrorMessage extends Component {
-    componentDidMount() {
-        const { store } = this.props;
+  componentDidMount() {
+    const { store } = this.props;
 
-        store.dispatch(
-            Actions.ErrorHandlerActions.setError({
-                stateKey: 'error',
-                error: 'An error occurred!'
-            })
-        );
-    }
+    store.dispatch(
+      Actions.ErrorHandlerActions.setError({
+        stateKey: 'error',
+        error: 'An error occurred!'
+      })
+    );
+  }
 
-    render() {
-        const errorData = {
-            columns,
-            data: [],
-            pageSize,
-            plugins: {
-                ERROR_HANDLER: {
-                    defaultErrorMessage: 'AN ERROR OCURRED',
-                    enabled: true
-                }
-            },
-            events,
-            store: this.props.store,
-            stateKey: 'error'
-        };
+  render() {
+    const errorData = {
+      columns,
+      data: [],
+      pageSize,
+      plugins: {
+        ERROR_HANDLER: {
+          defaultErrorMessage: 'AN ERROR OCURRED',
+          enabled: true
+        }
+      },
+      events,
+      store: this.props.store,
+      stateKey: 'error'
+    };
 
-        return (
-            <Grid { ...errorData } />
-        );
-    }
-};
+    return <Grid {...errorData} />;
+  }
+}
 
 const { object } = PropTypes;
 
 ErrorMessage.propTypes = {
-    store: object.isRequired
+  store: object.isRequired
 };
 
 ErrorMessage.defaultProps = {};

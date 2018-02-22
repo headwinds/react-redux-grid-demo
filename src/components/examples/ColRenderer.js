@@ -1,67 +1,60 @@
 /* eslint-disable */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Grid } from 'react-redux-grid';
 
-import {
-    data,
-    pageSize,
-    events,
-    dataSource
-} from './data/demodata';
+import { data, pageSize, events, dataSource } from './data/demodata';
 
 export const ColRenderer = ({ store }) => {
+  const cols = [
+    {
+      name: 'Phone',
+      dataIndex: 'phone number',
+      renderer: ob => {
+        const imgProps = {
+          src:
+            '//icons.iconarchive.com/icons/icons8/windows-8/512/Mobile-Phone-icon.png',
+          style: {
+            height: '20px'
+          }
+        };
 
-    const cols = [{
-        name: 'Phone',
-        dataIndex: 'phone number',
-        renderer: (ob) => {
+        const spanProps = {
+          style: {
+            position: 'relative',
+            top: '-5px',
+            left: '10px'
+          }
+        };
 
-            const imgProps = {
-                src: '//icons.iconarchive.com/icons/icons8/windows-8/512/Mobile-Phone-icon.png',
-                style: {
-                    height: '20px'
-                }
-            };
-
-            const spanProps = {
-                style: {
-                    position: 'relative',
-                    top: '-5px',
-                    left: '10px'
-                }
-            };
-
-            return (
-                <span>
-                    <img { ...imgProps } />
-                    <span { ...spanProps }>
-                        { ob.row['Phone Number'] }
-                    </span>
-                </span>
-                );
-        }
-    }];
-
-    const colData = {
-        columns: cols,
-        data,
-        pageSize,
-        plugins: {},
-        events,
-        dataSource,
-        store,
-        stateKey: 'colRenderer'
-    };
-
-    return (
-        <Grid { ...colData } />
+        return (
+          <span>
+            <img {...imgProps} />
+            <span {...spanProps}>{ob.row['Phone Number']}</span>
+          </span>
         );
+      }
+    }
+  ];
+
+  const colData = {
+    columns: cols,
+    data,
+    pageSize,
+    plugins: {},
+    events,
+    dataSource,
+    store,
+    stateKey: 'colRenderer'
+  };
+
+  return <Grid {...colData} />;
 };
 
 const { object } = PropTypes;
 
 ColRenderer.propTypes = {
-    store: object.isRequired
+  store: object.isRequired
 };
 
 ColRenderer.defaultProps = {};

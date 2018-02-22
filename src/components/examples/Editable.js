@@ -1,55 +1,48 @@
 /* eslint-disable */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Grid } from 'react-redux-grid';
 
-import {
-    columns,
-    data,
-    pageSize,
-    events,
-    dataSource
-} from './data/demodata';
+import { columns, data, pageSize, events, dataSource } from './data/demodata';
 
 export class Editable extends Component {
+  render() {
+    const { store } = this.props;
+    const { on } = this.state;
 
-    render() {
+    const editableProps = {
+      columns,
+      data: on ? [] : data,
+      pageSize,
+      plugins: {
+        EDITOR: {
+          enabled: true,
+          type: 'grid'
+        }
+      },
+      events,
+      store,
+      stateKey: 'editable'
+    };
 
-        const { store } = this.props;
-        const { on } = this.state;
+    return <Grid {...editableProps} />;
+  }
 
-        const editableProps = {
-            columns,
-            data: on ? [] : data,
-            pageSize,
-            plugins: {
-                EDITOR: {
-                    enabled: true,
-                    type: 'grid'
-                }
-            },
-            events,
-            store,
-            stateKey: 'editable'
-        };
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
 
-        return <Grid { ...editableProps } />;
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    handleClick = () => {
-        const { on } = this.state;
-        this.setState({ on: !on });
-    }
+  handleClick = () => {
+    const { on } = this.state;
+    this.setState({ on: !on });
+  };
 }
 
 const { object } = PropTypes;
 
 Editable.propTypes = {
-    store: object.isRequired
+  store: object.isRequired
 };
 
 Editable.defaultProps = {};

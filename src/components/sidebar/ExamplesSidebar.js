@@ -3,35 +3,30 @@ import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
 import gridIconOff from './gridBlueIcon.svg';
 import gridIconOn from './gridPurpleIcon.svg';
-import {
-  switchFeature
-} from '../../redux/actions/appActions';
+import { switchFeature } from '../../redux/actions/appActions';
 import './Sidebar.css';
 
 class ExamplesSidebar extends Component {
-
-  constructor(props){
+  constructor(props) {
     super(props);
     let selectedFeature = this.props.app.featureTitle;
     this.state = { selectedFeature };
   }
 
-  componentWillReceiveProps(nextProps){
-    this.props = nextProps; 
-    this.setState({
-      selectedFeature: this.props.app.featureTitle
-    });
+  componentDidMount() {}
+
+  componentWillReceiveProps(nextProps) {
+    this.props = nextProps;
+
+    this.setState({ selectedFeature: nextProps.featureTitle });
   }
 
-  componentDidUpdate(){
-    let selectedFeature = this.props.app.featureTitle;
-    this.setState({ selectedFeature });
-  }
+  componentDidUpdate() {}
 
-  handleClick(item, event){
+  handleClick(item, event) {
     event.preventDefault();
-    
-    const capitalizeFirstLetter = (string) => {
+
+    const capitalizeFirstLetter = string => {
       return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
@@ -41,35 +36,48 @@ class ExamplesSidebar extends Component {
 
   render() {
     const { featureTitles } = this.props.app;
-    const listItems = featureTitles.map((featureTitle) => {
+    const listItems = featureTitles.map(featureTitle => {
       let boundClick = this.handleClick.bind(this, featureTitle);
-      if (this.state.selectedFeature === featureTitle) 
-        return  (<li key={featureTitle}> <button onClick={boundClick} className="gridButtonOn"><img src={gridIconOn} className="gridIcon" alt="grid logo" /><p className="gridLabelOn">{featureTitle}</p></button></li>)
-      else 
-        return (<li key={featureTitle}> <button onClick={boundClick} className="gridButtonOff"><img src={gridIconOff} className="gridIcon" alt="grid logo" /><p className="gridLabelOff">{featureTitle}</p></button></li>)
+      if (this.props.app.featureTitle === featureTitle)
+        return (
+          <li key={featureTitle}>
+            {' '}
+            <button onClick={boundClick} className="gridButtonOn">
+              <img src={gridIconOn} className="gridIcon" alt="grid logo" />
+              <p className="gridLabelOn">{featureTitle}</p>
+            </button>
+          </li>
+        );
+      else
+        return (
+          <li key={featureTitle}>
+            {' '}
+            <button onClick={boundClick} className="gridButtonOff">
+              <img src={gridIconOff} className="gridIcon" alt="grid logo" />
+              <p className="gridLabelOff">{featureTitle}</p>
+            </button>
+          </li>
+        );
     });
     return (
-        <div className="sidebarContainer examplesContainer">
-           <h2 className="gridH2">Examples</h2>
-           <ul>
-            {listItems}
-           </ul>
-        </div>
+      <div className="sidebarContainer examplesContainer">
+        <h2 className="gridH2">Examples</h2>
+        <ul>{listItems}</ul>
+      </div>
     );
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   app: state.app
 });
 
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-      changeRoute: (url) => dispatch(push(url)),
-      switchFeature: (featureTitle) => dispatch(switchFeature(featureTitle)),
-      dispatch,
-    };
-}
+const mapDispatchToProps = dispatch => {
+  return {
+    changeRoute: url => dispatch(push(url)),
+    switchFeature: featureTitle => dispatch(switchFeature(featureTitle)),
+    dispatch
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExamplesSidebar);

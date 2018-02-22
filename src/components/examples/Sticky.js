@@ -1,51 +1,43 @@
 /* eslint-disable */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Grid } from 'react-redux-grid';
 
-import {
+import { columns, data, pageSize, events, plugins } from './data/demodata';
+
+export const Sticky = ({ store }) => {
+  const stickyData = {
     columns,
     data,
     pageSize,
+    plugins: {
+      ...plugins,
+      STICKY_HEADER: {
+        enabled: true
+      },
+      STICKY_FOOTER: {
+        enabled: true
+      },
+      FILTER_CONTAINER: {
+        enabled: false
+      },
+      BULK_ACTIONS: {
+        enabled: false
+      }
+    },
+    height: '',
     events,
-    plugins
-} from './data/demodata';
+    store,
+    stateKey: 'sticky'
+  };
 
-export const Sticky = ({ store }) => {
-
-    const stickyData = {
-        columns,
-        data,
-        pageSize,
-        plugins: {
-            ...plugins,
-            STICKY_HEADER: {
-                enabled: true
-            },
-            STICKY_FOOTER: {
-                enabled: true
-            },
-            FILTER_CONTAINER: {
-                enabled: false
-            },
-            BULK_ACTIONS: {
-                enabled: false
-            }
-        },
-        height: '',
-        events,
-        store,
-        stateKey: 'sticky'
-    };
-
-    return (
-        <Grid { ...stickyData } />
-        );
+  return <Grid {...stickyData} />;
 };
 
 const { object } = PropTypes;
 
 Sticky.propTypes = {
-    store: object.isRequired
+  store: object.isRequired
 };
 
 Sticky.defaultProps = {};

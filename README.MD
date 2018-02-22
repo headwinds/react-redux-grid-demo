@@ -8,15 +8,23 @@ The relevant (to grid) source code is located in:
 
 `/src/components/examples`
 
-## Getting Started 
+## Getting Started
 
 ```
 npm install
 npm start
 ```
-This will launch the examples website at http://localhost:3000 as well as a fake data API service on http://localhost:3001 
+This will launch the examples website at http://localhost:3000 as well as a fake data API service on http://localhost:3001
 
-## Contributing 
+## Featured Examples
+
+* Simple - a basic implementation
+* Bootstrap - leverages the bootstrap CSS
+* Tree - renders data structured in a tree with nested categories
+* Stress - virtualized table that can deal with a million records
+* Bulk Selection - features a Firebase database connection, paging, and bulk delete   
+
+## Contributing
 
 To begin creating an example, you can also simply copy an example folder and rename it.
 
@@ -29,27 +37,27 @@ When you add a new example, you will need to:
 
 ## Tests
 
-We are using [jest](https://facebook.github.io/) & [enzyme](http://airbnb.io/enzyme) to manage our test suite with the goal of testing each example. We could use help here in testing the examples if you would like to contribute. Don't worry if you've never written tests before, this is good example site to learn. 
+We are using [jest](https://facebook.github.io/) & [enzyme](http://airbnb.io/enzyme) to manage our test suite with the goal of testing each example. We could use help here in testing the examples if you would like to contribute. Don't worry if you've never written tests before, this is good example site to learn.
 
-When you run the tests, they should all be passing. Please file a bug if you see any failing; better yet fix the fail and push an update! 
+When you run the tests, they should all be passing. Please file a bug if you see any failing; better yet fix the fail and push an update!
 
 ```
 npm test
 ```
 
-## Website 
+## Website
 
-We used create-react-app to build the website adding Redux & React-Redux-Grid. 
+We used create-react-app to build the website adding Redux & React-Redux-Grid.
 
 ```
-create-react-app folderName 
+create-react-app folderName
 cd folderName
 npm i redux react-redux react-redux-grid redux-logger --save
 ```
 
 [shields.io](http://shields.io/)
 
-## React-Redux-Grid 
+## React-Redux-Grid
 
 This is examples site but the main library can be found here:
 

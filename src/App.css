@@ -4,7 +4,7 @@
 }
 
 .split {
-  display: flex; 
+  display: flex;
   flex-direction: row;
   justify-content: flex-start;
   margin-left: 10px;
@@ -15,9 +15,40 @@
   color: #663399;
 }
 
+label {
+  font-weight: 400;
+}
+
+form {
+  font-family: 'Open Sans';
+  font-weight: 400;
+}
+
+p.tutorial {
+  width: 600px;
+  font-family: 'Open Sans';
+}
+
+label {
+  font-family: 'Arial';
+  font-weight: 'normal';
+}
+
+.sidebarContainer {
+  display: block;
+  position: relative;
+  width: 180px;
+}
+
 .tableContainer {
   display: block;
   position: relative;
+}
+
+.featureContainer {
+  display: block;
+  position: relative;
+  width: 180px;
 }
 
 ul {
@@ -33,7 +64,8 @@ li {
   padding: 0px;
 }
 
-.react-redux-grid-active, .react-redux-grid-inactive {
+.react-redux-grid-active,
+.react-redux-grid-inactive {
   margin: 5px;
   border-radius: 5px;
   background-color: #49b8dc;
@@ -55,9 +87,7 @@ li {
   margin-top: 10px;
 }
 
-
-
 :focus {
   border: none;
   outline: none;
-};
+}

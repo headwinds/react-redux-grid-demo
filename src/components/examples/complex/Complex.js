@@ -1,94 +1,94 @@
 /* eslint-disable */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Grid, Actions } from 'react-redux-grid';
 
 import {
-    columns,
-    data,
-    pageSize,
-    events,
-    plugins,
-    dataSource
+  columns,
+  data,
+  pageSize,
+  events,
+  plugins,
+  dataSource
 } from '../data/demodata';
 
 export const Complex = ({ store }) => {
+  const stateKey = 'complex';
 
-    const stateKey = 'complex';
+  const complexData = {
+    columns: [
+      {
+        name: 'Name',
+        width: '10%',
+        className: 'additional-class',
+        dataIndex: 'Name',
+        sortable: true,
+        HANDLE_CLICK: () => {
+          console.log('Header Click');
+        }
+      },
+      {
+        name: 'Phone Number',
+        width: '20%',
+        dataIndex: 'Phone Number',
+        sortable: true,
+        className: 'additional-class'
+      },
+      {
+        name: 'Email',
+        width: '25%',
+        dataIndex: 'Email',
+        sortable: true,
+        className: 'additional-class',
+        defaultSortDirection: 'descend'
+      },
+      {
+        name: 'Address',
+        dataIndex: 'Address',
+        sortable: true,
+        width: '35%',
+        className: 'additional-class'
+      }
+    ],
+    data,
+    pageSize,
+    plugins: {
+      ...plugins,
+      BULK_ACTIONS: {
+        enabled: true
+      },
+      GRID_ACTIONS: {
+        iconCls: 'action-icon',
+        menu: [
+          {
+            text: 'DeleteA',
+            EVENT_HANDLER: ({ metaData }) => {
+              const rowIndex = metaData.rowIndex;
 
-    const complexData = {
-        columns: [
-            {
-                name: 'Name',
-                width: '10%',
-                className: 'additional-class',
-                dataIndex: 'Name',
-                sortable: true,
-                HANDLE_CLICK: () => { console.log('Header Click'); }
-            },
-            {
-                name: 'Phone Number',
-                width: '20%',
-                dataIndex: 'Phone Number',
-                sortable: true,
-                className: 'additional-class'
-            },
-            {
-                name: 'Email',
-                width: '25%',
-                dataIndex: 'Email',
-                sortable: true,
-                className: 'additional-class',
-                defaultSortDirection: 'descend'
-            },
-            {
-                name: 'Address',
-                dataIndex: 'Address',
-                sortable: true,
-                width: '35%',
-                className: 'additional-class'
+              store.dispatch(
+                Actions.EditorActions.removeRow({
+                  stateKey,
+                  rowIndex
+                })
+              );
             }
-        ],
-        data,
-        pageSize,
-        plugins: {
-            ...plugins,
-            BULK_ACTIONS: {
-                enabled: true
-            },
-            GRID_ACTIONS: {
-                iconCls: 'action-icon',
-                menu: [
-                    {
-                        text: 'DeleteA',
-                        EVENT_HANDLER: ({ metaData }) => {
-                            const rowIndex = metaData.rowIndex;
+          }
+        ]
+      }
+    },
+    events,
+    dataSource,
+    store,
+    stateKey
+  };
 
-                            store.dispatch(
-                                Actions.EditorActions.removeRow({
-                                    stateKey,
-                                    rowIndex
-                                })
-                            );
-                        }
-                    }
-                ]
-            }
-        },
-        events,
-        dataSource,
-        store,
-        stateKey
-    };
-
-    return (
-        <Grid { ...complexData } />
-        );
+  return <Grid {...complexData} />;
 };
 
 const { object } = PropTypes;
 
 Complex.propTypes = {
-    store: object.isRequired
+  store: object.isRequired
 };
 
 Complex.defaultProps = {};

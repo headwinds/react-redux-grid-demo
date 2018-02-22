@@ -2,136 +2,109 @@
 import React, { Component } from 'react';
 import { Grid, Actions } from 'react-redux-grid';
 import { connect } from 'react-redux';
-import BulkPager from './BulkPager'; 
+import BulkPager from './BulkPager';
 import store from '../../../redux/configureStore';
-import Api from './..//data/Api';
+import Api from './Api';
 
-import {
-    columns,
-    events,
-    plugins,
-} from '../data/demodata';
+import { columns, events, plugins } from '../data/demodata';
 
 class BulkSelection extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props){
-        super(props);
+    console.log('BulkSelection constructor: ', props);
 
-        console.log("BulkSelection constructor: ", props);
-
-        const pagerConfig = {
-            pageSize: this.props.bulkSelection.pageSize
-        }
-
+    this.state = {
+      users: []
     };
+  }
 
-    componentWillReceiveProps(nextProps, nextState) {
-        this.props = nextProps;
-    };
+  componentWillReceiveProps(nextProps, nextState) {
+    this.props = nextProps;
+  }
 
-    componentDidMount() {
+  componentDidMount() {}
 
-    };
+  componentDidUpdate() {
+    console.log('BulkSelection componentDidUpdate this.props: ', this.props);
+  }
 
-    componentDidUpdate() {
-        console.log("BulkSelection componentDidUpdate this.props: ", this.props);
-         
-    };
+  render() {
+    const dataSource = Api;
 
-    render(){
-        console.log("BulkSelection render this.props: ", this.props);
+    console.log('BulkSelection render this.state: ', this.state);
+    const config = {
+      columns,
+      dataSource,
+      pageSize: 10,
+      plugins: {
+        ...plugins,
+        STICKY_HEADER: {
+          enabled: true
+        },
+        STICKY_FOOTER: {
+          enabled: true
+        },
+        FILTER_CONTAINER: {
+          enabled: true
+        },
 
-        let pagerConfig = {
-            data: this.props.bulkSelection.data,
-            pageSize: this.props.bulkSelection.pageSize
-        }
-
-        let config = {
-                columns,
-                dataSource: Api,
-                pageSize: pagerConfig.pageSize,
-                plugins: {
-                    ...plugins,
-                    STICKY_HEADER: {
-                        enabled: true
-                    },
-                    STICKY_FOOTER: {
-                        enabled: true
-                    },
-                    FILTER_CONTAINER: {
-                        enabled: true
-                    },
-
-                    PAGER: {
-                        enabled: true,
-                        pagingType: 'remote',
-                        pagerComponent: (
-                            <BulkPager
-                                api={Api}
-                                store={store}
-                            />
-                        )
-                    },
-                    BULK_ACTIONS: {
-                        enabled: true,
-                        actions: [
-                            {
-                                text: 'Move',
-                                EVENT_HANDLER: () => {
-
-                                }
-                            },
-                            {
-                                text: 'Add',
-                                EVENT_HANDLER: () => {
-
-                                }
-                            }
-                        ]
-                    },
-                    GRID_ACTIONS: {
-                        iconCls: 'action-icon',
-                        menu: [
-                            {
-                                text: 'Delete',
-                                EVENT_HANDLER: ({ metaData }) => {
-                                    const rowIndex = metaData.rowIndex;
-
-                                    store.dispatch(
-                                        Actions.EditorActions.removeRow({
-                                            stateKey,
-                                            rowIndex
-                                        })
-                                    );
-                                }
-                            }
-                        ]
-                    }
-                },
-                height: '',
-                events,
-                store,
-                stateKey: 'bulk' 
+        PAGER: {
+          enabled: true,
+          pagingType: 'remote',
+          pagerComponent: <BulkPager api={Api} store={store} />
+        },
+        BULK_ACTIONS: {
+          enabled: true,
+          actions: [
+            {
+              text: 'Move',
+              EVENT_HANDLER: () => {}
+            },
+            {
+              text: 'Add',
+              EVENT_HANDLER: () => {}
             }
+          ]
+        },
+        GRID_ACTIONS: {
+          iconCls: 'action-icon',
+          menu: [
+            {
+              text: 'Delete',
+              EVENT_HANDLER: ({ metaData }) => {
+                const rowIndex = metaData.rowIndex;
 
-
-        return (
-            <Grid { ...config } />
-            );
+                store.dispatch(
+                  Actions.EditorActions.removeRow({
+                    stateKey,
+                    rowIndex
+                  })
+                );
+              }
+            }
+          ]
+        }
+      },
+      height: '',
+      events,
+      store,
+      stateKey: 'bulk'
     };
+
+    return <Grid {...config} />;
+  }
 }
-
-
 
 const mapStateToProps = (state, ownProps) => ({
   grid: state.grid,
-  bulkSelection: state.bulkSelection,
+  bulkSelection: state.bulkSelection
 });
 
 const mapDispatchToProps = dispatch => {
   return {
     dispatch
-  }
-}
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(BulkSelection);
