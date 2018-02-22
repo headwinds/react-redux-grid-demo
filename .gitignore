@@ -12,4 +12,5 @@ coverage
 npm-debug.log
 yarn.lock
 
-src/components/examples/bulk-selection/firebaseConfig.js
+# uncomment out to when ready to deploy to your own hosting 
+# src/components/examples/bulk-selection/firebaseConfig.js
