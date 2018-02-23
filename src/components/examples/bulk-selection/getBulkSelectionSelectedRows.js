@@ -26,11 +26,8 @@ const getBulkSelectionSelectedRows = props => {
 
   console.log('getBulkSelectionSelectedRows selectedIds: ', selectedIds.length);
 
-  const rowsSelectedMessage =
-    totalRowsSelected > 0
-      ? totalRowsSelected + ' Rows Selected'
-      : '0 Rows Selected';
-
+  return totalRowsSelected > 0 ? totalRowsSelected : '0';
+  /*
   if (
     props.app.featureTitle === 'BulkSelection' &&
     props.bulkSelection.recordsRemoved.length > 0
@@ -60,6 +57,7 @@ const getBulkSelectionSelectedRows = props => {
   } else {
     return null;
   }
+  */
 };
 
 export default getBulkSelectionSelectedRows;

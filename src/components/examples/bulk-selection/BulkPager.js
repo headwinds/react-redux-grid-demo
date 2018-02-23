@@ -19,7 +19,7 @@ class BulkPager extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPageLimit: 10
+      currentPageLimit: pageSize
     };
 
     this.handleSelectChange = this.handleSelectChange.bind(this);

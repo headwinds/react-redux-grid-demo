@@ -1,6 +1,7 @@
 /* eslint-disable */
 //import * as FirebaseConnection from './';
 import * as _ from 'lodash';
+import axios from 'axios';
 import Promise from 'bluebird';
 import * as firebase from 'firebase';
 import { config } from './firebaseConfig';
@@ -17,39 +18,55 @@ const pageSize = 10;
 let currentPageIndex = 0;
 
 export const addRecord = user => {
-  return db.ref('users').push(user);
+  /*
+  easiest way to add a record but I want to store the key as an id too
+  this make is easier for to remove the records later
+    //return db.ref('/users').push(user);
+  */
+
+  const ref = db.ref('/users').push();
+  return ref.set({ ...user, key: ref.key });
+
+  //return db.ref('/users').push(user);
 };
 
-export const bulkDeleteRows = indexes => {
-  //return FirebaseConnection.db.ref('users').push(user);
+export const bulkDeleteRows = keys => {
+  console.log('bulkDeleteRows: ', keys);
+  const allDeletePromises = [];
+  const usersRef = getUsersRef();
+
+  _.each(keys, key => {
+    const promise = usersRef.child(key).remove();
+    allDeletePromises.push(promise);
+  });
+  /*
+    _.each(snapshot.val(), item => {
+      _.each(keys, key => {
+        if (key === item.key) {
+          const promise = usersRef.child(item.key).remove();
+          allDeletePromises.push(promise);
+        }
+      });
+    });
+    */
+
+  return Promise.all(allDeletePromises);
 };
 
 export const onceGetUsers = () => db.ref('users').once('value');
 
-export const postUser = user => db.ref('/users').push(user);
-
 export const getUsersRef = () => db.ref('/users');
-
-export const deleteUsers = ids => {
-  const usersRef = getUsersRef();
-  const allDeletePromises = [];
-  ids.each(id => {
-    const promise = usersRef.child(id).remove();
-    allDeletePromises.push(allDeletePromises);
-  });
-  return Promise.all(allDeletePromises);
-};
 
 // create a 1000 fake users
 export const postFakeUsers = user => {
   const users = [];
   _.times(1000, index => {
     const user = {
-      id: index,
       name: `${faker.name.findName()}`,
       phone: `${faker.phone.phoneNumber()}`,
       email: `${faker.internet.email()}`,
-      address: `${faker.address.streetAddress()} ${faker.address.streetName()}`
+      address: `${faker.address.streetAddress()} ${faker.address.streetName()}`,
+      key: index
     };
 
     users.push(user);
@@ -58,7 +75,20 @@ export const postFakeUsers = user => {
   db.ref('/users').set(users);
 };
 
+export const getUsers = useShallow => {
+  /* axios will work just need to research this more and remove the cors issue via express
+  const url = useShallow
+    ? 'https://react-redux-grid.firebaseio.com/users?shallow=true'
+    : 'https://react-redux-grid.firebaseio.com/users';
+  return axios.get(url);
+  */
+
+  return db.ref('/users').once('value');
+};
+
 export const dataSource = function getData({ pageIndex }) {
+  console.log('datasource ', arguments);
+
   return new Promise((resolve, reject) => {
     //reject('missing properties');
     const ref = db.ref('users');
@@ -76,11 +106,14 @@ export const dataSource = function getData({ pageIndex }) {
           console.log('dataSource ', snapshot.val());
 
           const users = _.map(snapshot.val(), user => {
+            //console.log(user);
+
             return {
               Name: user.name,
               'Phone Number': user.phone,
               Address: user.address,
-              Email: user.email
+              Email: user.email,
+              Id: user.key
             };
           }).reverse();
 

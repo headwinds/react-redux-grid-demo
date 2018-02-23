@@ -3,9 +3,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import faker from 'faker';
 import getBulkSelectionSelectedRows from './getBulkSelectionSelectedRows';
-import { addRecord, bulkDeleteRows, postFakeUsers } from './Api';
+import { addRecord, bulkDeleteRows, postFakeUsers, getUsers } from './Api';
+import firebaseIcon from './firebase.svg';
 
 const purple = '#644581';
+const red = 'firebrick';
+const maxRowsTotal = 5000;
+const minRowsTotal = 500;
+
+const labelStyle = { fontFamily: 'Open Sans' };
 
 class BulkSelectionAddDelete extends Component {
   constructor(props) {
@@ -13,6 +19,8 @@ class BulkSelectionAddDelete extends Component {
 
     this.handleAddClick = this.handleAddClick.bind(this);
     this.handleBulkActionClick = this.handleBulkActionClick.bind(this);
+    this.getCurrentTotalRows = this.getCurrentTotalRows.bind(this);
+    this.getCurrentPage = this.getCurrentPage.bind(this);
 
     this.state = {
       name: `${faker.name.findName()}`,
@@ -22,7 +30,8 @@ class BulkSelectionAddDelete extends Component {
       serverAddFeedbackMessage: '',
       serverAddFeedbackMessageStyle: { color: purple },
       serverBulkDeleteFeedbackMessage: '',
-      serverBulkDeleteFeedbackMessageStyle: { color: purple }
+      serverBulkDeleteFeedbackMessageStyle: { color: purple },
+      currentRowsTotal: 0
     };
 
     console.log('BulkSelectionTutorial constructor: ', props);
@@ -36,10 +45,26 @@ class BulkSelectionAddDelete extends Component {
     //
     // this creates your database and populates it with a 1000 fake users
     //postFakeUsers();
+
+    this.getCurrentTotalRows();
   }
 
   componentDidUpdate() {
     console.log('BulkSelection componentDidUpdate this.props: ', this.props);
+  }
+
+  getCurrentPage() {}
+
+  getCurrentTotalRows() {
+    // this is not an optimal approach - I need to learn how to use cloud functions to maintain a count
+    // https://stackoverflow.com/questions/15148803/in-firebase-is-there-a-way-to-get-the-number-of-children-of-a-node-without-load
+    getUsers(true).then(
+      snapshot => {
+        const currentRowsTotal = Object.keys(snapshot.val()).length;
+        this.setState({ currentRowsTotal });
+      },
+      error => {}
+    );
   }
 
   handleBulkActionClick(e) {
@@ -58,7 +83,25 @@ class BulkSelectionAddDelete extends Component {
       }
     }
 
+    if (selectedIds.length === 0) {
+      return this.setState({
+        serverBulkDeleteFeedbackMessage: 'No rows selected',
+        serverBulkDeleteFeedbackMessageStyle: { color: 'firebrick' }
+      });
+    }
+
     console.log('handleBulkActionClick selectedIds: ', selectedIds);
+
+    const serverKeys = [];
+    _.each(this.props.bulkSelection.data, (serverData, index) => {
+      _.each(selectedIds, selectId => {
+        if (selectId === index) {
+          serverKeys.push(serverData.Id);
+        }
+      });
+    });
+
+    console.log('handleBulkActionClick serverKeys: ', serverKeys);
 
     /*
     const list = this.props.gridData.get('data');
@@ -75,22 +118,25 @@ class BulkSelectionAddDelete extends Component {
     this.props.bulkDisplay({ removed, remaining });
     */
 
-    /*
-    bulkDeleteRows(selectedIds).then(
-      response => {
+    bulkDeleteRows(serverKeys).then(
+      snapshots => {
+        // an array of snapshot responses for each row removed
+        const record = serverKeys.length > 1 ? 'record' : 'records';
         this.setState({
-          serverBulkDeleteFeedbackMessage: 'Record added successfully',
+          serverBulkDeleteFeedbackMessage: 'Success, ' + record + ' removed',
           serverBulkDeleteFeedbackMessageStyle: { color: purple }
         });
+
+        this.getCurrentTotalRows();
+        this.getCurrentPage();
       },
       error => {
         this.setState({
-          serverBulkDeleteFeedbackMessage: 'Error adding Record',
-          serverBulkDeleteFeedbackMessageStyle: { color: 'red' }
+          serverBulkDeleteFeedbackMessage: 'Error removing ' + record,
+          serverBulkDeleteFeedbackMessageStyle: { color: red }
         });
       }
     );
-    */
   }
 
   handleAddClick() {
@@ -102,17 +148,26 @@ class BulkSelectionAddDelete extends Component {
     };
     console.log('handleAddClick record: ', record);
 
-    addRecord().then(
+    if (this.state.currentRowsTotal > 5000) {
+      return this.setState({
+        serverAddFeedbackMessage:
+          'Record Limit reached - please delete some records to add new ones',
+        serverAddFeedbackMessageStyle: { color: red }
+      });
+    }
+
+    addRecord(record).then(
       response => {
         this.setState({
           serverAddFeedbackMessage: 'Record added successfully',
           serverAddFeedbackMessageStyle: { color: purple }
         });
+        this.getCurrentTotalRows();
       },
       error => {
         this.setState({
           serverAddFeedbackMessage: 'Error adding Record',
-          serverAddFeedbackMessageStyle: { color: 'red' }
+          serverAddFeedbackMessageStyle: { color: red }
         });
       }
     );
@@ -144,7 +199,7 @@ class BulkSelectionAddDelete extends Component {
         >
           <form style={{ width: 350 }}>
             <div style={rowStyle}>
-              <label>name</label>
+              <label style={labelStyle}>name</label>
               <input
                 style={inputStyle}
                 value={this.state.name}
@@ -152,7 +207,7 @@ class BulkSelectionAddDelete extends Component {
               />
             </div>
             <div style={rowStyle}>
-              <label>phone</label>
+              <label style={labelStyle}>phone</label>
               <input
                 style={inputStyle}
                 value={this.state.phone}
@@ -160,7 +215,7 @@ class BulkSelectionAddDelete extends Component {
               />
             </div>
             <div style={rowStyle}>
-              <label>email</label>
+              <label style={labelStyle}>email</label>
               <input
                 style={inputStyle}
                 value={this.state.email}
@@ -168,44 +223,68 @@ class BulkSelectionAddDelete extends Component {
               />
             </div>
             <div style={rowStyle}>
-              <label>address</label>
+              <label style={labelStyle}>address</label>
               <input
                 style={inputStyle}
                 value={this.state.address}
                 readOnly={true}
               />
             </div>
+
+            <div style={{ margin: 10, marginLeft: 90 }}>
+              <button
+                className="react-redux-grid-active"
+                onClick={this.handleAddClick}
+              >
+                Add Record
+              </button>
+              <div>
+                <span style={this.state.serverAddFeedbackMessageStyle}>
+                  {' '}
+                  {this.state.serverAddFeedbackMessage}
+                </span>
+              </div>
+            </div>
           </form>
           <div style={{ marginLeft: 10 }}>
-            {getBulkSelectionSelectedRows(this.props)}
-
-            <button
-              className="react-redux-grid-active"
-              style={{ backgroundColor: 'firebrick' }}
-              onClick={this.handleBulkActionClick}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                height: 'auto',
+                margin: 0
+              }}
             >
-              Bulk Delete Rows
-            </button>
-            <div>
-              <span style={this.state.serverBulkDeleteFeedbackMessageStyle}>
-                {' '}
-                {this.state.serverBulkDeleteFeedbackMessage}
-              </span>
+              <div>
+                <img src={firebaseIcon} width="60" />
+              </div>
+              <div style={{ width: 500, padding: 10 }}>
+                <p style={{ fontFamily: 'Open Sans' }}>
+                  This firebase database currently has a total of{' '}
+                  {this.state.currentRowsTotal} records with a max limit of{' '}
+                  {maxRowsTotal} and a min limit of {minRowsTotal}. In this
+                  example, I want to show the ids so that you can see that
+                  Firebase id are generated as a unique id based on a timestamp.
+                  The saved id is not the same as the visible row index.
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-        <div style={{ margin: 10, marginLeft: 120 }}>
-          <button
-            className="react-redux-grid-active"
-            onClick={this.handleAddClick}
-          >
-            Add Record
-          </button>
-          <div>
-            <span style={this.state.serverAddFeedbackMessageStyle}>
-              {' '}
-              {this.state.serverAddFeedbackMessage}
-            </span>
+            <div style={{ float: 'right' }}>
+              <button
+                className="react-redux-grid-active"
+                style={{ backgroundColor: 'firebrick' }}
+                onClick={this.handleBulkActionClick}
+              >
+                Bulk Delete {getBulkSelectionSelectedRows(this.props)} Rows
+              </button>
+              <div>
+                <span style={this.state.serverBulkDeleteFeedbackMessageStyle}>
+                  {' '}
+                  {this.state.serverBulkDeleteFeedbackMessage}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

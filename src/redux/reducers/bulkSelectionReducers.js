@@ -1,11 +1,11 @@
-import * as types from "../types/types"; 
-import {data} from "../../components/examples/data/demodata";
+import * as types from '../types/types';
+
 // import {SET_DATA} from "react-redux-grid/src/constants/ActionTypes"; how can I get the types?!
 
 const initialState = {
   ready: false,
   pageSize: 10,
-  data: data,
+  data: [],
   recordsRemaining: [],
   recordsRemoved: []
 };
@@ -17,25 +17,26 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         ready: true
       };
-     case types.PAGING_CHANGE_LIMIT:
+    case types.PAGING_CHANGE_LIMIT:
       return {
         ...state,
         pageSize: action.newPageLimit
-      };  
+      };
     case types.GRID_ROWS_BULK_DELETE:
       return {
         ...state,
         data: action.newRows
-      };  
-     case types.BULK_DISPLAY:
+      };
+    case types.BULK_DISPLAY:
       return {
         ...state,
         recordsRemaining: action.recordsRemaining,
         recordsRemoved: action.recordsRemoved
-      };   
-     case "@@react-redux-grid/SET_DATA":
-     return {
+      };
+    case '@@react-redux-grid/SET_DATA':
+      return {
         ...state,
+        data: action.currentRecords,
         recordsRemaining: [],
         recordsRemoved: []
       };
@@ -43,6 +44,3 @@ export default function reducer(state = initialState, action = {}) {
       return state;
   }
 }
-
-
-

@@ -6,7 +6,7 @@ import BulkPager from './BulkPager';
 import store from '../../../redux/configureStore';
 import Api from './Api';
 
-import { columns, events, plugins } from '../data/demodata';
+import { bulkSelectionColumns, events, plugins } from '../data/demodata';
 
 class BulkSelection extends Component {
   constructor(props) {
@@ -34,9 +34,9 @@ class BulkSelection extends Component {
 
     console.log('BulkSelection render this.state: ', this.state);
     const config = {
-      columns,
+      columns: bulkSelectionColumns,
       dataSource,
-      pageSize: 10,
+      pageSize: this.props.bulkSelection.pageSize,
       plugins: {
         ...plugins,
         STICKY_HEADER: {
@@ -48,7 +48,6 @@ class BulkSelection extends Component {
         FILTER_CONTAINER: {
           enabled: true
         },
-
         PAGER: {
           enabled: true,
           pagingType: 'remote',
