@@ -7,14 +7,6 @@ import * as firebase from 'firebase';
 import { config } from './firebaseConfig';
 import faker from 'faker';
 import store from '../../../redux/configureStore';
-import { FirebasePaginator } from './FirebasePaginator';
-
-//var FirebasePaginator = require('../../../../node_modules/firebase-paginator/dist/firebase-paginator');
-//https://www.npmjs.com/package/firebase-react-paginated
-
-// https://jsfiddle.net/katowulf/s74y3cy5/
-
-//import FirebasePaginator from 'firebase-paginator/dist/';
 
 if (!firebase.apps.length) {
   firebase.initializeApp(config);
@@ -32,8 +24,6 @@ export const addRecord = user => {
 
   const ref = db.ref('/users').push();
   return ref.set({ ...user, key: ref.key });
-
-  //return db.ref('/users').push(user);
 };
 
 export const bulkDeleteRows = keys => {
@@ -45,16 +35,6 @@ export const bulkDeleteRows = keys => {
     const promise = usersRef.child(key).remove();
     allDeletePromises.push(promise);
   });
-  /*
-    _.each(snapshot.val(), item => {
-      _.each(keys, key => {
-        if (key === item.key) {
-          const promise = usersRef.child(item.key).remove();
-          allDeletePromises.push(promise);
-        }
-      });
-    });
-    */
 
   return Promise.all(allDeletePromises);
 };
@@ -82,62 +62,75 @@ export const postFakeUsers = user => {
 };
 
 export const getUsers = useShallow => {
-  /* axios will work just need to research this more and remove the cors issue via express
-  const url = useShallow
-    ? 'https://react-redux-grid.firebaseio.com/users?shallow=true'
-    : 'https://react-redux-grid.firebaseio.com/users';
-  return axios.get(url);
-  */
-
   return db.ref('/users').once('value');
 };
-
-let pages = {};
-
-// on bulk delete need to reset this!
-const options = {
-  pageSize: store.getState().bulkSelection.pageSize,
-  finite: true,
-  retainLastPage: false
-};
-
-const ref = db.ref('users');
-const paginator = new FirebasePaginator(ref, options);
 
 export const dataSource = function getData({ pageIndex, pageSize }) {
   const pageData = arguments[0];
   console.log('BulkSelection getData pageData ', pageData);
 
-  if (!pageData.pageSize)
-    pageData['pageSize'] = store.getState().bulkSelection.pageSize;
-  if (!pageData.pageIndex)
-    pageData['pageIndex'] = store.getState().bulkSelection.pageIndex;
+  const bulkSelectionState = store.getState().bulkSelection;
+
+  if (!pageData.pageSize) pageData['pageSize'] = bulkSelectionState.pageSize;
+  if (!pageData.pageIndex) pageData['pageIndex'] = bulkSelectionState.pageIndex;
 
   console.log('BulkSelection getData pageIndex', pageData.pageIndex);
   console.log('BulkSelection getData pageSize', pageData.pageSize);
 
+  const paginator = bulkSelectionState.paginator;
+
   return new Promise((resolve, reject) => {
     //const newPageSize = pageData.pageSize ? pageData.pageSize : 1;
-    paginator.goToPage(pageData.pageIndex, 10).then(snapshot => {
-      console.log('collection', paginator.collection);
 
-      const users = _.map(paginator.collection, user => {
-        return {
-          Name: user.name,
-          'Phone Number': user.phone,
-          Address: user.address,
-          Email: user.email,
-          Id: user.key
-        };
-      }).reverse();
+    console.log('BulkSelection getData paginator', paginator);
 
-      console.log('dataSource getData lastQuery users', users.length);
+    // only finite strategy supports goToPage
+    // infinite can only do next and previous
 
-      resolve({
-        data: users,
-        total: users.length
+    if (paginator.isFinite) {
+      paginator.goToPage(pageData.pageIndex, 10).then(snapshot => {
+        console.log('collection', paginator.collection);
+
+        const users = _.map(paginator.collection, user => {
+          return {
+            Name: user.name,
+            'Phone Number': user.phone,
+            Address: user.address,
+            Email: user.email,
+            Id: user.key
+          };
+        }).reverse();
+
+        console.log('dataSource getData lastQuery users', users.length);
+
+        resolve({
+          data: users,
+          total: users.length
+        });
       });
-    });
+    } else {
+      // would need to determine if this is the next or previous click!
+      paginator.next().then(snapshot => {
+        console.log('collection', paginator.collection);
+
+        const users = _.map(paginator.collection, user => {
+          return {
+            Name: user.name,
+            'Phone Number': user.phone,
+            Address: user.address,
+            Email: user.email,
+            Id: user.key
+          };
+        }).reverse();
+
+        console.log('dataSource getData lastQuery users', users.length);
+
+        resolve({
+          data: users,
+          total: users.length
+        });
+      });
+    }
   });
 };
 

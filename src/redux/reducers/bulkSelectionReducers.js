@@ -1,16 +1,38 @@
+/* eslint-disable */
 import * as types from '../types/types';
+import * as firebase from 'firebase';
+import FirebasePaginator from '../../components/examples/bulk-selection/FirebasePaginator';
+import { config } from '../../components/examples/bulk-selection/firebaseConfig';
 
 // import {SET_DATA} from "react-redux-grid/src/constants/ActionTypes"; how can I get the types?!
+const pageSize = 10;
+// on bulk delete need to reset this!
+const options = {
+  pageSize,
+  finite: true,
+  retainLastPage: false,
+  isBrowser: false
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
+const db = firebase.database();
+const ref = db.ref('users');
+const paginator = new FirebasePaginator(ref, options);
+
+console.log('paginator: ', paginator);
 
 const initialState = {
   ready: false,
-  pageSize: 10,
+  pageSize,
   pageIndex: 1,
   data: [],
   recordsRemaining: [],
   recordsRemoved: [],
   currentPageIndex: 1,
-  bulkUpdateComplete: false
+  bulkUpdateComplete: false,
+  paginator
 };
 
 export default function reducer(state = initialState, action = {}) {
