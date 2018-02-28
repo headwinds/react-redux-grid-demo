@@ -6,6 +6,15 @@ import Promise from 'bluebird';
 import * as firebase from 'firebase';
 import { config } from './firebaseConfig';
 import faker from 'faker';
+import store from '../../../redux/configureStore';
+import { FirebasePaginator } from './FirebasePaginator';
+
+//var FirebasePaginator = require('../../../../node_modules/firebase-paginator/dist/firebase-paginator');
+//https://www.npmjs.com/package/firebase-react-paginated
+
+// https://jsfiddle.net/katowulf/s74y3cy5/
+
+//import FirebasePaginator from 'firebase-paginator/dist/';
 
 if (!firebase.apps.length) {
   firebase.initializeApp(config);
@@ -13,9 +22,6 @@ if (!firebase.apps.length) {
 
 const db = firebase.database();
 const auth = firebase.auth();
-
-const pageSize = 10;
-let currentPageIndex = 0;
 
 export const addRecord = user => {
   /*
@@ -86,44 +92,52 @@ export const getUsers = useShallow => {
   return db.ref('/users').once('value');
 };
 
-export const dataSource = function getData({ pageIndex }) {
-  console.log('datasource ', arguments);
+let pages = {};
+
+// on bulk delete need to reset this!
+const options = {
+  pageSize: store.getState().bulkSelection.pageSize,
+  finite: true,
+  retainLastPage: false
+};
+
+const ref = db.ref('users');
+const paginator = new FirebasePaginator(ref, options);
+
+export const dataSource = function getData({ pageIndex, pageSize }) {
+  const pageData = arguments[0];
+  console.log('BulkSelection getData pageData ', pageData);
+
+  if (!pageData.pageSize)
+    pageData['pageSize'] = store.getState().bulkSelection.pageSize;
+  if (!pageData.pageIndex)
+    pageData['pageIndex'] = store.getState().bulkSelection.pageIndex;
+
+  console.log('BulkSelection getData pageIndex', pageData.pageIndex);
+  console.log('BulkSelection getData pageSize', pageData.pageSize);
 
   return new Promise((resolve, reject) => {
-    //reject('missing properties');
-    const ref = db.ref('users');
+    //const newPageSize = pageData.pageSize ? pageData.pageSize : 1;
+    paginator.goToPage(pageData.pageIndex, 10).then(snapshot => {
+      console.log('collection', paginator.collection);
 
-    //pageIndex = typeof pageIndex === 'undefined' ? currentPageIndex : pageIndex;
+      const users = _.map(paginator.collection, user => {
+        return {
+          Name: user.name,
+          'Phone Number': user.phone,
+          Address: user.address,
+          Email: user.email,
+          Id: user.key
+        };
+      }).reverse();
 
-    currentPageIndex++;
-    console.log('calling', currentPageIndex, pageSize);
+      console.log('dataSource getData lastQuery users', users.length);
 
-    const lastQuery = ref
-      .limitToLast(currentPageIndex * pageSize)
-      .once('value')
-      .then(
-        snapshot => {
-          console.log('dataSource ', snapshot.val());
-
-          const users = _.map(snapshot.val(), user => {
-            //console.log(user);
-
-            return {
-              Name: user.name,
-              'Phone Number': user.phone,
-              Address: user.address,
-              Email: user.email,
-              Id: user.key
-            };
-          }).reverse();
-
-          resolve({
-            data: users,
-            total: users.length
-          });
-        },
-        error => {}
-      );
+      resolve({
+        data: users,
+        total: users.length
+      });
+    });
   });
 };
 

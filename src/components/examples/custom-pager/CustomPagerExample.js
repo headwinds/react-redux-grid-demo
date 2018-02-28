@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CustomPager from './CustomPager';
 import CustomPagerWriteup from './CustomPagerWriteup';
+import store from '../../../redux/configureStore';
 
 import { columns, events, plugins } from '../data/demodata';
 
@@ -26,7 +27,7 @@ class CustomPagerExample extends Component {
   render() {
     return (
       <div>
-        <CustomPager props={this.props} />
+        <CustomPager props={this.props} store={store} />
         <CustomPagerWriteup />
       </div>
     );

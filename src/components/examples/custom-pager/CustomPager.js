@@ -2,9 +2,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid } from 'react-redux-grid';
-import store from '../../../redux/configureStore';
 import Pager from './Pager';
 import Api from './../data/Api';
+import store from '../../../redux/configureStore';
 
 import { columns, data, events, dataSource } from './../data/demodata';
 

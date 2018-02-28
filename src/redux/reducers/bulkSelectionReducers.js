@@ -5,9 +5,12 @@ import * as types from '../types/types';
 const initialState = {
   ready: false,
   pageSize: 10,
+  pageIndex: 1,
   data: [],
   recordsRemaining: [],
-  recordsRemoved: []
+  recordsRemoved: [],
+  currentPageIndex: 1,
+  bulkUpdateComplete: false
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -26,6 +29,16 @@ export default function reducer(state = initialState, action = {}) {
       return {
         ...state,
         data: action.newRows
+      };
+    case types.BULK_PAGE_UPDATE_START:
+      return {
+        ...state,
+        bulkUpdateComplete: false
+      };
+    case types.BULK_PAGE_UPDATE_COMPLETE:
+      return {
+        ...state,
+        bulkUpdateComplete: true
       };
     case types.BULK_DISPLAY:
       return {

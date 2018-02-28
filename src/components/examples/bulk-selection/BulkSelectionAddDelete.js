@@ -1,9 +1,14 @@
 /* eslint-disable */
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import faker from 'faker';
 import getBulkSelectionSelectedRows from './getBulkSelectionSelectedRows';
 import { addRecord, bulkDeleteRows, postFakeUsers, getUsers } from './Api';
+import {
+  fetchCurrentPage,
+  resetSelection
+} from '../../../redux/actions/bulkSelectionActions';
 import firebaseIcon from './firebase.svg';
 
 const purple = '#644581';
@@ -53,7 +58,10 @@ class BulkSelectionAddDelete extends Component {
     console.log('BulkSelection componentDidUpdate this.props: ', this.props);
   }
 
-  getCurrentPage() {}
+  getCurrentPage() {
+    this.props.fetchCurrentPage();
+    this.props.resetSelection();
+  }
 
   getCurrentTotalRows() {
     // this is not an optimal approach - I need to learn how to use cloud functions to maintain a count
@@ -128,7 +136,7 @@ class BulkSelectionAddDelete extends Component {
         });
 
         this.getCurrentTotalRows();
-        this.getCurrentPage();
+        this.getCurrentPage(); // reset selection ids!
       },
       error => {
         this.setState({
@@ -160,7 +168,11 @@ class BulkSelectionAddDelete extends Component {
       response => {
         this.setState({
           serverAddFeedbackMessage: 'Record added successfully',
-          serverAddFeedbackMessageStyle: { color: purple }
+          serverAddFeedbackMessageStyle: { color: purple },
+          name: `${faker.name.findName()}`,
+          phone: `${faker.phone.phoneNumber()}`,
+          email: `${faker.internet.email()}`,
+          address: `${faker.address.streetAddress()} ${faker.address.streetName()}`
         });
         this.getCurrentTotalRows();
       },
@@ -300,11 +312,8 @@ const mapStateToProps = (state, ownProps) => ({
   selection: state.selection
 });
 
-const mapDispatchToProps = dispatch => {
-  return {
-    dispatch
-  };
-};
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ fetchCurrentPage, resetSelection }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(
   BulkSelectionAddDelete

@@ -19,13 +19,42 @@ class BulkPager extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPageLimit: pageSize
+      currentPageLimit: pageSize,
+      currentPage: 1
     };
 
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleNumberedPageButtonClick = this.handleNumberedPageButtonClick.bind(
       this
     );
+    this.updatePage = this.updatePage.bind(this);
+
+    console.log('BulkPager constructor');
+  }
+
+  componentDidMount() {
+    console.log('BulkPager componentDidMount');
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('BulkPager componentWillReceiveProps nextProps: ', nextProps);
+
+    this.props = nextProps;
+
+    const selectedIndexes = this.getSelectedIds();
+    if (selectedIndexes.length === 0) {
+      //this.updatePage();
+    }
+    console.log(
+      'BulkPager componentWillReceiveProps selectedIndexes: ',
+      selectedIndexes.length
+    );
+
+    //this.updatePage(this.state.currentPage);
+  }
+
+  componentDidUpdate(nextProps) {
+    console.log('BulkPager componentDidUpdate');
   }
 
   getSelectedIds() {
@@ -70,9 +99,9 @@ class BulkPager extends Component {
     ]);
   }
 
-  handleNumberedPageButtonClick(e) {
-    const newPageIndex = parseInt(e.target.innerHTML) - 1;
-
+  updatePage(newPageIndex) {
+    console.log('updatePage newPageIndex: ', newPageIndex);
+    /*
     this.props.getAsyncData({
       dataSource: this.props.api,
       stateKey: 'bulk',
@@ -81,6 +110,7 @@ class BulkPager extends Component {
         pageSize: this.state.currentPageLimit
       }
     });
+    */
 
     Promise.all([
       this.props.getAsyncData({
@@ -99,6 +129,14 @@ class BulkPager extends Component {
         stateKey: 'bulk'
       })
     ]);
+
+    this.setState({ currentPage: newPageIndex });
+  }
+
+  handleNumberedPageButtonClick(e) {
+    const newPageIndex = parseInt(e.target.innerHTML) - 1;
+
+    this.updatePage(newPageIndex);
   }
 
   render() {

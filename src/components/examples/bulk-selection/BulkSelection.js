@@ -15,24 +15,45 @@ class BulkSelection extends Component {
     console.log('BulkSelection constructor: ', props);
 
     this.state = {
-      users: []
+      users: [],
+      update: false
     };
+
+    this.update = this.update.bind(this);
   }
 
   componentWillReceiveProps(nextProps, nextState) {
+    console.log(
+      'BulkSelection componentWillReceiveProps nextProps: ',
+      nextProps
+    );
+
     this.props = nextProps;
   }
 
   componentDidMount() {}
 
-  componentDidUpdate() {
-    console.log('BulkSelection componentDidUpdate this.props: ', this.props);
+  componentDidUpdate(nextProps) {
+    console.log('BulkSelection componentDidUpdate nextProps: ', nextProps);
   }
 
-  render() {
-    const dataSource = Api;
+  componentWillReceiveProps(nextProps) {
+    console.log(
+      'BulkSelection componentWillReceiveProps nextProps: ',
+      nextProps
+    );
+  }
 
+  shouldComponentUpdate() {
+    console.log('BulkSelection shouldComponentUpdate ');
+    return true;
+  }
+
+  update() {}
+
+  render() {
     console.log('BulkSelection render this.state: ', this.state);
+    const dataSource = Api;
     const config = {
       columns: bulkSelectionColumns,
       dataSource,
@@ -97,7 +118,9 @@ class BulkSelection extends Component {
 
 const mapStateToProps = (state, ownProps) => ({
   grid: state.grid,
-  bulkSelection: state.bulkSelection
+  bulkSelection: state.bulkSelection,
+  app: state.app,
+  selection: state.selection
 });
 
 const mapDispatchToProps = dispatch => {

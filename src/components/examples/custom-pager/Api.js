@@ -1,6 +1,13 @@
 export const dataSource = function getData({ pageIndex }) {
+  console.log('CustomPager getData datasource ', arguments[0]);
+  const pageData = arguments[0];
+  console.log('CustomPagerApi getDatadatasource pageIndex', pageData.pageIndex);
+  console.log(' CustomPagerApi getData datasource pageSize', pageData.pageSize);
+
   return new Promise(resolve => {
     const request = new XMLHttpRequest();
+
+    console.log('CustomPager dataSource pageIndex: ', pageIndex);
 
     const config = {
       method: 'GET',
