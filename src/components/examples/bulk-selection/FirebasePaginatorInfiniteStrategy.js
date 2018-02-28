@@ -1,7 +1,8 @@
 /* eslint-disable */
+import axios from 'axios';
 
 class InfinitePagingStrategy {
-  constructor(paginator, ref, auth, isBrowser, pageSize, axios) {
+  constructor(paginator) {
     // infinite pagination
     this.paginator = paginator;
 

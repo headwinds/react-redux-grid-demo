@@ -1,9 +1,5 @@
 /* eslint-disable */
 
-// this could be a dynamic import in the future
-// but I think most modern JS devs will want to use axios over a XMLHttpRequest request
-// to warrant having it as a direct import even if they aren't using nodejs
-import axios from 'axios';
 import FinitePagingStrategy from './FirebasePaginatorFiniteStrategy';
 import InfinitePagingStrategy from './FirebasePaginatorInfiniteStrategy';
 
